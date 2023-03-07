@@ -4,7 +4,9 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
+	"strings"
 )
 
 type StaticCheckEntry struct {
@@ -39,17 +41,15 @@ func main() {
 		var entry StaticCheckEntry
 		err := json.Unmarshal([]byte(scanner.Text()), &entry)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "Error:", err)
-			continue
+			log.Fatal(err)
 		}
 
-		// Create a new GitlabCIEntry object from the StaticCheckEntry
 		var gitlabEntry GitlabCIEntry
 		gitlabEntry.Description = entry.Message
 		gitlabEntry.Fingerprint = entry.Code
 		gitlabEntry.Severity = entry.Severity
 
-		gitlabEntry.Location.Path = entry.Location.File
+		gitlabEntry.Location.Path = getRelativePath(entry.Location.File)
 		gitlabEntry.Location.Lines.Begin = entry.Location.Line
 		gitlabEntries = append(gitlabEntries, gitlabEntry)
 	}
@@ -58,4 +58,12 @@ func main() {
 		fmt.Fprintln(os.Stderr, "Error:", err)
 	}
 	fmt.Println(string(gitlabJson))
+}
+
+func getRelativePath(absolutePath string) string {
+	path, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return strings.ReplaceAll(absolutePath, path+"/", "")
 }
