@@ -46,7 +46,7 @@ func main() {
 
 		var gitlabEntry GitlabCIEntry
 		gitlabEntry.Description = entry.Message
-		gitlabEntry.Fingerprint = entry.Code
+		gitlabEntry.Fingerprint = fmt.Sprintf("%s%s%d%d", entry.Code, entry.Location.File, entry.Location.Line, entry.Location.Column)
 		gitlabEntry.Severity = entry.Severity
 
 		gitlabEntry.Location.Path = getRelativePath(entry.Location.File)
