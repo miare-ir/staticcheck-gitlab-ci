@@ -58,6 +58,10 @@ func main() {
 		fmt.Fprintln(os.Stderr, "Error:", err)
 	}
 	fmt.Println(string(gitlabJson))
+	if len(gitlabEntries) == 0 {
+		os.Exit(0)
+	}
+	os.Exit(1)
 }
 
 func getRelativePath(absolutePath string) string {
